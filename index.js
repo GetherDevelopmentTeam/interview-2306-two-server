@@ -11,7 +11,7 @@ const app = new express();
 
 app.use(express.json());
 
-app.use("/event", eventRouter);
+app.use("/api/event", eventRouter);
 
 app.get("/", (req, res) => {
   res.json({
