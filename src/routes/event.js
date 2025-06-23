@@ -1,6 +1,8 @@
-import { Router } from "express";
-import { Event } from "../model/event";
-const router = Router();
+
+const express = require("express");
+const { Event } = require("../model/event.js");
+const router = new express.Router();
+
 
 router.get("/", async (req, res) => {
   try {
@@ -9,11 +11,15 @@ router.get("/", async (req, res) => {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
 
-    let skip = page * limit;
+    let skip = (page - 1) * limit;
 
     const events = await Event.find().skip(skip).limit(limit);
 
-    res.status(200).json(events);
+    res.status(200).json({
+      events: events,
+      page: page,
+    });
+    
   } catch (error) {
     res.status(500).json({
       error: error?.message || "Server Error",
@@ -25,7 +31,13 @@ router.post("/", async (req, res) => {
   try {
     const { title, date, time, description } = req.body;
 
+    
     // data validation
+    if (!title || !date || !time || !description) {
+      return res.status(400).json({
+        error: "All fields are required",
+      });
+    }
 
     const event = new Event({
       title,
@@ -46,4 +58,35 @@ router.post("/", async (req, res) => {
   }
 });
 
-export { router };
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if(!id) {
+      return res.status(400).json({
+        error: "Event ID is required",
+      });
+    }
+
+    const result = await Event.findOneAndDelete({
+      _id: id,
+    });
+
+    if (!result) {
+      return res.status(404).json({
+        error: "Event not found",
+      });
+    }
+
+    res.status(200).json({
+      msg: "Event deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error?.message || "Server Error",
+    });
+  }
+});
+
+
+module.exports = router;

@@ -1,15 +1,23 @@
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
+
+const express = require("express");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 // Routes
-import { router as eventRouter } from "./src/routes/event.js";
+const eventRouter  = require("./src/routes/event.js");
 
 dotenv.config();
 
-const app = new express();
+const app = express();
 
 app.use(express.json());
+app.use(cors(
+  {
+    origin: "*"
+  }
+));
+
 
 app.use("/api/event", eventRouter);
 
