@@ -1,8 +1,6 @@
-
 const express = require("express");
 const { Event } = require("../model/event.js");
 const router = new express.Router();
-
 
 router.get("/", async (req, res) => {
   try {
@@ -11,15 +9,20 @@ router.get("/", async (req, res) => {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
 
-    let skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
+
+    const totalEvents = await Event.countDocuments();
+    const totalPages = Math.ceil(totalEvents / limit);
 
     const events = await Event.find().skip(skip).limit(limit);
 
     res.status(200).json({
-      events: events,
-      page: page,
+      events,
+      page,
+      totalPages,
+      totalEvents
     });
-    
+
   } catch (error) {
     res.status(500).json({
       error: error?.message || "Server Error",
@@ -31,8 +34,6 @@ router.post("/", async (req, res) => {
   try {
     const { title, date, time, description } = req.body;
 
-    
-    // data validation
     if (!title || !date || !time || !description) {
       return res.status(400).json({
         error: "All fields are required",
@@ -62,15 +63,13 @@ router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
 
-    if(!id) {
+    if (!id) {
       return res.status(400).json({
         error: "Event ID is required",
       });
     }
 
-    const result = await Event.findOneAndDelete({
-      _id: id,
-    });
+    const result = await Event.findOneAndDelete({ _id: id });
 
     if (!result) {
       return res.status(404).json({
@@ -87,6 +86,5 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;
