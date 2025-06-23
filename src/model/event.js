@@ -1,21 +1,24 @@
-import {Schema} from "mongoose"
-
+import { Schema, model } from "mongoose";
 
 const eventSchema = new Schema({
-    title: {
-        type: string,
-        default: ""
-    },
-    date: {
-        type: string,
-        default: "",
-    },
-    time: {
-        type: string,
-        default: "",
-    },
-    description: {
-        type: string,
-        default: "",
-    },
-})
+  title: {
+    type: String,
+    default: "",
+  },
+  date: {
+    type: String,
+    default: "",
+  },
+  time: {
+    type: String,
+    default: "",
+  },
+  description: {
+    type: String,
+    default: "",
+  },
+});
+
+const Event = model("event", eventSchema);
+
+module.exports = Event;

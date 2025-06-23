@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 // Routes
 import { router as eventRouter } from "./src/routes/event.js";
@@ -17,6 +18,18 @@ app.get("/", (req, res) => {
     status: true,
   });
 });
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Mongodb connect");
+  })
+  .catch((e) => {
+    console.log("Failed to connect  ", e);
+  });
 
 const PORT = process.env.PORT || 5000;
 
